@@ -7,8 +7,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
+import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 
 public class ChaveEnergiaItem extends Item {
 
@@ -19,71 +20,61 @@ public class ChaveEnergiaItem extends Item {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
-        
-        if (!level.isClientSide) {
-            BlockPos posClicado = context.getClickedPos();
-            var itemStack = context.getItemInHand();
-            
-            // Nova forma de pegar ou criar a tag customizada no Minecraft moderno
-            CustomData customData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-            CompoundTag nbt = customData.copyTag();
+        if (level.isClientSide) return InteractionResult.PASS;
 
-            if (nbt.contains("X_Fonte")) {
-                int fonteX = nbt.getInt("X_Fonte");
-                int fonteY = nbt.getInt("Y_Fonte");
-                int fonteZ = nbt.getInt("Z_Fonte");
-                BlockPos posFonte = new BlockPos(fonteX, fonteY, fonteZ);
+        BlockPos posClicado = context.getClickedPos();
+        var itemStack = context.getItemInHand();
+        CustomData customData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+        CompoundTag nbt = customData.copyTag();
 
-                var blocoFonteEntity = level.getBlockEntity(posFonte);
-                var blocoDestinoEntity = level.getBlockEntity(posClicado);
+        if (nbt.contains("X_Fonte")) {
+            // Segundo clique - aplicar energia
+            BlockPos posFonte = new BlockPos(
+                nbt.getInt("X_Fonte"),
+                nbt.getInt("Y_Fonte"),
+                nbt.getInt("Z_Fonte")
+            );
 
-                if (blocoFonteEntity instanceof com.simibubi.create.content.kinetics.base.KineticBlockEntity fonteKbe &&
-                    blocoDestinoEntity instanceof com.simibubi.create.content.kinetics.base.KineticBlockEntity destinoKbe) {
-                    
-                    float velocidadeFonte = fonteKbe.getSpeed();
-
-                    if (velocidadeFonte != 0) {
-                        destinoKbe.setSpeed(velocidadeFonte);
-                        destinoKbe.updateFromNetwork(velocidadeFonte, fonteKbe.getStressLimit(), fonteKbe.getAddedStressCapacity());
-                        destinoKbe.notifyUpdate();
-                        
-                        if (context.getPlayer() != null) {
-                            context.getPlayer().sendSystemMessage(
-                                Component.literal("§aLink de energia estabelecido! Velocidade: " + velocidadeFonte + " RPM")
-                            );
-                        }
-                    } else {
-                        if (context.getPlayer() != null) {
-                            context.getPlayer().sendSystemMessage(Component.literal("§cErro: A fonte selecionada está parada!"));
-                        }
-                    }
-                } else {
-                    if (context.getPlayer() != null) {
-                        context.getPlayer().sendSystemMessage(Component.literal("§cErro: Blocos incompatíveis."));
-                    }
-                }
-                
-                // Remove e limpa os dados salvando de volta no item
-                nbt.remove("X_Fonte");
-                nbt.remove("Y_Fonte");
-                nbt.remove("Z_Fonte");
-                itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
-                
-            } else {
-                // Guarda a nova fonte e salva no item usando Data Components
-                nbt.putInt("X_Fonte", posClicado.getX());
-                nbt.putInt("Y_Fonte", posClicado.getY());
-                nbt.putInt("Z_Fonte", posClicado.getZ());
-                itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
-                
-                if (context.getPlayer() != null) {
-                    context.getPlayer().sendSystemMessage(
-                        Component.literal("§eFonte mecânica guardada: " + posClicado.toShortString())
-                    );
-                }
+            if (!(level.getBlockEntity(posFonte) instanceof KineticBlockEntity fonteKbe) ||
+                !(level.getBlockEntity(posClicado) instanceof KineticBlockEntity destinoKbe)) {
+                context.getPlayer().sendSystemMessage(Component.literal("§cErro: Um dos blocos não é compatível com energia cinética."));
+                return InteractionResult.FAIL;
             }
-            return InteractionResult.SUCCESS;
+
+            float velocidade = fonteKbe.getSpeed();
+            if (velocidade == 0) {
+                context.getPlayer().sendSystemMessage(Component.literal("§cA fonte está parada!"));
+                return InteractionResult.SUCCESS;
+            }
+
+            // Forma mais confiável de propagar a velocidade no Create
+            destinoKbe.setSpeed(velocidade);
+            destinoKbe.updateFromNetwork(velocidade, fonteKbe.getStressCapacity(), fonteKbe.getAddedStressCapacity());
+            destinoKbe.notifyUpdate();
+            destinoKbe.sendData();
+
+            context.getPlayer().sendSystemMessage(
+                Component.literal("§aEnergia transferida! Velocidade: " + velocidade + " RPM")
+            );
+
+            // Limpa o item
+            nbt.remove("X_Fonte");
+            nbt.remove("Y_Fonte");
+            nbt.remove("Z_Fonte");
+            itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
+
+        } else {
+            // Primeiro clique - salvar fonte
+            nbt.putInt("X_Fonte", posClicado.getX());
+            nbt.putInt("Y_Fonte", posClicado.getY());
+            nbt.putInt("Z_Fonte", posClicado.getZ());
+            itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
+
+            context.getPlayer().sendSystemMessage(
+                Component.literal("§eFonte salva: " + posClicado.toShortString() + " §7(Clique no destino agora)")
+            );
         }
-        return InteractionResult.PASS;
+
+        return InteractionResult.SUCCESS;
     }
 }
