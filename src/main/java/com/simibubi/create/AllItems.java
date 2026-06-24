@@ -98,7 +98,6 @@ import io.github.fabricators_of_create.porting_lib.tags.Tags;
 
 // ==================== IMPORT DO SEU ITEM ====================
 import com.simibubi.create.content.equipment.wrench.ChaveEnergiaItem;
-;  // <<< TROQUE PELO PACOTE CERTO DA SUA CLASSE
 
 public class AllItems {
 	private static final CreateRegistrate REGISTRATE = Create.registrate();
@@ -496,7 +495,7 @@ public class AllItems {
 		.properties(p -> p.stacksTo(1))
 		.register();
 
-	// ==================== SEU ITEM ====================
+	// ==================== SEU ITEM CHAVE DE ENERGIA ====================
 	public static final ItemEntry<ChaveEnergiaItem> CHAVE_ENERGIA = REGISTRATE.item("chave_energia", ChaveEnergiaItem::new)
 			.properties(p -> p.stacksTo(1))
 			.model((c, p) -> p.handheld(c))
@@ -530,4 +529,4 @@ public class AllItems {
 
 	public static void register() {
 	}
-						}
+}
