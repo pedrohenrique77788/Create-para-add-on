@@ -1,0 +1,36 @@
+name: Compilar Mod Fabric
+
+on:
+  push:
+    branches: [ "mc1.20.1/fabric/dev" ] # Executa quando você der push nessa branch
+  pull_request:
+    branches: [ "mc1.20.1/fabric/dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Baixar o código do repositório
+      uses: actions/checkout@v4
+
+    - name: Configurar o JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17' # Minecraft 1.20.1 usa Java 17
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Dar permissão de execução ao Gradle
+      run: chmod +x ./fabric/dev/gradlew
+
+    - name: Compilar o Mod (JAR)
+      run: ./gradlew build
+      working-directory: ./fabric/dev # Abre a pasta onde o Gradle do mod está
+
+    - name: Salvar o JAR do Mod
+      uses: actions/upload-artifact@v4
+      with:
+        name: meu-mod-fabric
+        path: fabric/dev/build/libs/*.jar # Caminho onde o Fabric gera o mod
+
