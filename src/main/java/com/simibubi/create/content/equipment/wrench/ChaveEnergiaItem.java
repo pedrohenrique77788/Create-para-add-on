@@ -11,6 +11,7 @@ import net.minecraft.world.level.Level;
 
 public class ChaveEnergiaItem extends Item {
 
+
     public ChaveEnergiaItem(Properties properties) {
         super(properties);
     }
