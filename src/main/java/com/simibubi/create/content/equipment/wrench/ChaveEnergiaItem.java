@@ -22,12 +22,9 @@ public class ChaveEnergiaItem extends Item {
 
         BlockPos posClicado = context.getClickedPos();
         var itemStack = context.getItemInHand();
-        
-        // Pega ou cria a tag NBT padrão do sistema da 1.20.1
         CompoundTag nbt = itemStack.getOrCreateTag();
 
         if (nbt.contains("X_Fonte")) {
-            // Segundo clique - aplicar energia
             BlockPos posFonte = new BlockPos(
                 nbt.getInt("X_Fonte"),
                 nbt.getInt("Y_Fonte"),
@@ -45,7 +42,6 @@ public class ChaveEnergiaItem extends Item {
                     return InteractionResult.SUCCESS;
                 }
 
-                // Transferir velocidade
                 destinoKbe.setSpeed(velocidade);
                 destinoKbe.notifyUpdate();
 
@@ -55,7 +51,6 @@ public class ChaveEnergiaItem extends Item {
                     );
                 }
 
-                // Limpa o item removendo as tags
                 nbt.remove("X_Fonte");
                 nbt.remove("Y_Fonte");
                 nbt.remove("Z_Fonte");
@@ -68,7 +63,6 @@ public class ChaveEnergiaItem extends Item {
             }
 
         } else {
-            // Primeiro clique - salvar fonte
             nbt.putInt("X_Fonte", posClicado.getX());
             nbt.putInt("Y_Fonte", posClicado.getY());
             nbt.putInt("Z_Fonte", posClicado.getZ());
@@ -83,3 +77,4 @@ public class ChaveEnergiaItem extends Item {
         return InteractionResult.SUCCESS;
     }
 }
+
