@@ -33,41 +33,42 @@ public class ChaveEnergiaItem extends Item {
                 nbt.getInt("X_Fonte"),
                 nbt.getInt("Y_Fonte"),
                 nbt.getInt("Z_Fonte")
+            );
 
-				if (level.getBlockEntity(posFonte) instanceof KineticBlockEntity fonteKbe &&
-    level.getBlockEntity(posClicado) instanceof KineticBlockEntity destinoKbe) {
-    
-    // código normal aqui (velocidade, setSpeed, etc)
-    
-} else {
-    // mensagem de erro
-    return InteractionResult.FAIL;
-		}
+            if (level.getBlockEntity(posFonte) instanceof KineticBlockEntity fonteKbe &&
+                level.getBlockEntity(posClicado) instanceof KineticBlockEntity destinoKbe) {
 
-            float velocidade = fonteKbe.getSpeed();
-            if (velocidade == 0) {
-                if (context.getPlayer() != null) {
-                    context.getPlayer().sendSystemMessage(Component.literal("§cA fonte está parada!"));
+                float velocidade = fonteKbe.getSpeed();
+                if (velocidade == 0) {
+                    if (context.getPlayer() != null) {
+                        context.getPlayer().sendSystemMessage(Component.literal("§cA fonte está parada!"));
+                    }
+                    return InteractionResult.SUCCESS;
                 }
-                return InteractionResult.SUCCESS;
+
+                // Transferir velocidade
+                destinoKbe.setSpeed(velocidade);
+                destinoKbe.notifyUpdate();
+                destinoKbe.sendData();
+
+                if (context.getPlayer() != null) {
+                    context.getPlayer().sendSystemMessage(
+                        Component.literal("§aEnergia transferida! Velocidade: " + (int)velocidade + " RPM")
+                    );
+                }
+
+                // Limpa o item
+                nbt.remove("X_Fonte");
+                nbt.remove("Y_Fonte");
+                nbt.remove("Z_Fonte");
+                itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
+
+            } else {
+                if (context.getPlayer() != null) {
+                    context.getPlayer().sendSystemMessage(Component.literal("§cNão foi possível transferir energia! Ambos os blocos precisam ser Kinetic."));
+                }
+                return InteractionResult.FAIL;
             }
-
-            // Versão simples e mais compatível
-            destinoKbe.setSpeed(velocidade);
-            destinoKbe.notifyUpdate();
-            destinoKbe.sendData();
-
-            if (context.getPlayer() != null) {
-                context.getPlayer().sendSystemMessage(
-                    Component.literal("§aEnergia transferida! Velocidade: " + (int)velocidade + " RPM")
-                );
-            }
-
-            // Limpa o item
-            nbt.remove("X_Fonte");
-            nbt.remove("Y_Fonte");
-            nbt.remove("Z_Fonte");
-            itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
         } else {
             // Primeiro clique - salvar fonte
