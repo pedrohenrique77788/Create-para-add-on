@@ -38,7 +38,7 @@ public class ChaveEnergiaItem extends Item {
             if (!(level.getBlockEntity(posFonte) instanceof KineticBlockEntity fonteKbe) ||
                 !(level.getBlockEntity(posClicado) instanceof KineticBlockEntity destinoKbe)) {
                 if (context.getPlayer() != null) {
-                    context.getPlayer().sendSystemMessage(Component.literal("§cErro: Um dos blocos não é compatível com energia cinética."));
+                    context.getPlayer().sendSystemMessage(Component.literal("§cErro: Um dos blocos não suporta energia cinética."));
                 }
                 return InteractionResult.FAIL;
             }
@@ -51,15 +51,14 @@ public class ChaveEnergiaItem extends Item {
                 return InteractionResult.SUCCESS;
             }
 
-            // Aplicar velocidade de forma mais segura
+            // Versão simples e mais compatível
             destinoKbe.setSpeed(velocidade);
-            destinoKbe.updateFromNetwork(velocidade, fonteKbe.getStressLimit(), fonteKbe.getAddedStressCapacity());
             destinoKbe.notifyUpdate();
             destinoKbe.sendData();
 
             if (context.getPlayer() != null) {
                 context.getPlayer().sendSystemMessage(
-                    Component.literal("§aEnergia transferida! Velocidade: " + velocidade + " RPM")
+                    Component.literal("§aEnergia transferida! Velocidade: " + (int)velocidade + " RPM")
                 );
             }
 
@@ -78,7 +77,7 @@ public class ChaveEnergiaItem extends Item {
 
             if (context.getPlayer() != null) {
                 context.getPlayer().sendSystemMessage(
-                    Component.literal("§eFonte salva: " + posClicado.toShortString() + " §7(Clique no destino agora)")
+                    Component.literal("§eFonte salva em " + posClicado.toShortString() + " §7(Clique agora no destino)")
                 );
             }
         }
