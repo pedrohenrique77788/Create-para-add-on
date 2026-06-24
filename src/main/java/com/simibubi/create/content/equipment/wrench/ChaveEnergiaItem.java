@@ -33,15 +33,16 @@ public class ChaveEnergiaItem extends Item {
                 nbt.getInt("X_Fonte"),
                 nbt.getInt("Y_Fonte"),
                 nbt.getInt("Z_Fonte")
-            );
 
-            if (!(level.getBlockEntity(posFonte) instanceof KineticBlockEntity fonteKbe) ||
-                !(level.getBlockEntity(posClicado) instanceof KineticBlockEntity destinoKbe)) {
-                if (context.getPlayer() != null) {
-                    context.getPlayer().sendSystemMessage(Component.literal("§cErro: Um dos blocos não suporta energia cinética."));
-                }
-                return InteractionResult.FAIL;
-            }
+				if (level.getBlockEntity(posFonte) instanceof KineticBlockEntity fonteKbe &&
+    level.getBlockEntity(posClicado) instanceof KineticBlockEntity destinoKbe) {
+    
+    // código normal aqui (velocidade, setSpeed, etc)
+    
+} else {
+    // mensagem de erro
+    return InteractionResult.FAIL;
+		}
 
             float velocidade = fonteKbe.getSpeed();
             if (velocidade == 0) {
