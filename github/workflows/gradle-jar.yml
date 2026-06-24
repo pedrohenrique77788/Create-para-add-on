@@ -1,0 +1,35 @@
+name: Compilar JAR com Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Baixar o código do repositório
+      uses: actions/checkout@v4
+
+    - name: Configurar o JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Dar permissão de execução ao wrapper do Gradle
+      run: chmod +x ./gradlew
+
+    - name: Compilar o projeto e gerar o JAR
+      run: ./gradlew bootJar
+
+    - name: Salvar o arquivo JAR gerado
+      uses: actions/upload-artifact@v4
+      with:
+        name: meu-projeto-jar
+        path: build/libs/*.jar
+
