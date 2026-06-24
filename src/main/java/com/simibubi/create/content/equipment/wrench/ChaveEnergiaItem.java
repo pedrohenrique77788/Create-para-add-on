@@ -1,13 +1,11 @@
 package com.simibubi.create.content.equipment.wrench;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 
@@ -24,8 +22,9 @@ public class ChaveEnergiaItem extends Item {
 
         BlockPos posClicado = context.getClickedPos();
         var itemStack = context.getItemInHand();
-        CustomData customData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-        CompoundTag nbt = customData.copyTag();
+        
+        // Pega ou cria a tag NBT padrão do sistema da 1.20.1
+        CompoundTag nbt = itemStack.getOrCreateTag();
 
         if (nbt.contains("X_Fonte")) {
             // Segundo clique - aplicar energia
@@ -49,7 +48,6 @@ public class ChaveEnergiaItem extends Item {
                 // Transferir velocidade
                 destinoKbe.setSpeed(velocidade);
                 destinoKbe.notifyUpdate();
-                destinoKbe.sendData();
 
                 if (context.getPlayer() != null) {
                     context.getPlayer().sendSystemMessage(
@@ -57,11 +55,10 @@ public class ChaveEnergiaItem extends Item {
                     );
                 }
 
-                // Limpa o item
+                // Limpa o item removendo as tags
                 nbt.remove("X_Fonte");
                 nbt.remove("Y_Fonte");
                 nbt.remove("Z_Fonte");
-                itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
             } else {
                 if (context.getPlayer() != null) {
@@ -75,7 +72,6 @@ public class ChaveEnergiaItem extends Item {
             nbt.putInt("X_Fonte", posClicado.getX());
             nbt.putInt("Y_Fonte", posClicado.getY());
             nbt.putInt("Z_Fonte", posClicado.getZ());
-            itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
             if (context.getPlayer() != null) {
                 context.getPlayer().sendSystemMessage(
