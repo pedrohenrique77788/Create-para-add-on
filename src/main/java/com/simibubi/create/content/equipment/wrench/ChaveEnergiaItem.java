@@ -88,3 +88,4 @@ public class ChaveEnergiaItem extends Item {
         return InteractionResult.PASS;
     }
 }
+}
