@@ -37,25 +37,31 @@ public class ChaveEnergiaItem extends Item {
 
             if (!(level.getBlockEntity(posFonte) instanceof KineticBlockEntity fonteKbe) ||
                 !(level.getBlockEntity(posClicado) instanceof KineticBlockEntity destinoKbe)) {
-                context.getPlayer().sendSystemMessage(Component.literal("§cErro: Um dos blocos não é compatível com energia cinética."));
+                if (context.getPlayer() != null) {
+                    context.getPlayer().sendSystemMessage(Component.literal("§cErro: Um dos blocos não é compatível com energia cinética."));
+                }
                 return InteractionResult.FAIL;
             }
 
             float velocidade = fonteKbe.getSpeed();
             if (velocidade == 0) {
-                context.getPlayer().sendSystemMessage(Component.literal("§cA fonte está parada!"));
+                if (context.getPlayer() != null) {
+                    context.getPlayer().sendSystemMessage(Component.literal("§cA fonte está parada!"));
+                }
                 return InteractionResult.SUCCESS;
             }
 
-            // Forma mais confiável de propagar a velocidade no Create
+            // Aplicar velocidade de forma mais segura
             destinoKbe.setSpeed(velocidade);
-            destinoKbe.updateFromNetwork(velocidade, fonteKbe.getStressCapacity(), fonteKbe.getAddedStressCapacity());
+            destinoKbe.updateFromNetwork(velocidade, fonteKbe.getStressLimit(), fonteKbe.getAddedStressCapacity());
             destinoKbe.notifyUpdate();
             destinoKbe.sendData();
 
-            context.getPlayer().sendSystemMessage(
-                Component.literal("§aEnergia transferida! Velocidade: " + velocidade + " RPM")
-            );
+            if (context.getPlayer() != null) {
+                context.getPlayer().sendSystemMessage(
+                    Component.literal("§aEnergia transferida! Velocidade: " + velocidade + " RPM")
+                );
+            }
 
             // Limpa o item
             nbt.remove("X_Fonte");
@@ -70,9 +76,11 @@ public class ChaveEnergiaItem extends Item {
             nbt.putInt("Z_Fonte", posClicado.getZ());
             itemStack.set(DataComponents.CUSTOM_DATA, CustomData.of(nbt));
 
-            context.getPlayer().sendSystemMessage(
-                Component.literal("§eFonte salva: " + posClicado.toShortString() + " §7(Clique no destino agora)")
-            );
+            if (context.getPlayer() != null) {
+                context.getPlayer().sendSystemMessage(
+                    Component.literal("§eFonte salva: " + posClicado.toShortString() + " §7(Clique no destino agora)")
+                );
+            }
         }
 
         return InteractionResult.SUCCESS;
