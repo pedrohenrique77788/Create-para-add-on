@@ -96,6 +96,10 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
 
 import io.github.fabricators_of_create.porting_lib.tags.Tags;
 
+// ==================== IMPORT DO SEU ITEM ====================
+import com.simibubi.create.content.equipment.wrench.ChaveEnergiaItem;
+;  // <<< TROQUE PELO PACOTE CERTO DA SUA CLASSE
+
 public class AllItems {
 	private static final CreateRegistrate REGISTRATE = Create.registrate();
 
@@ -139,7 +143,7 @@ public class AllItems {
 		REGISTRATE.item("creative_blaze_cake", CombustibleItem::new)
 			.properties(p -> p.rarity(Rarity.EPIC))
 			.tag(AllItemTags.UPRIGHT_ON_BELT.tag)
-			.onRegister(i -> i.setBurnTime(Short.MAX_VALUE)) // fabric: furnaces are limited to Short values without Forge patches
+			.onRegister(i -> i.setBurnTime(Short.MAX_VALUE))
 			.register();
 
 	public static final ItemEntry<Item> BAR_OF_CHOCOLATE = REGISTRATE.item("bar_of_chocolate", Item::new)
@@ -243,7 +247,6 @@ public class AllItems {
 		CRUSHED_URANIUM = compatCrushedOre(URANIUM), CRUSHED_NICKEL = compatCrushedOre(NICKEL);
 
 	// Kinetics
-
 	public static final ItemEntry<BeltConnectorItem> BELT_CONNECTOR =
 		REGISTRATE.item("belt_connector", BeltConnectorItem::new)
 			.lang("Mechanical Belt")
@@ -278,16 +281,12 @@ public class AllItems {
 		REGISTRATE.item("crafting_blueprint", BlueprintItem::new)
 			.register();
 
-	// wrapped by COPPER_BACKTANK for block placement uses.
-	// must be registered as of 1.18.2
 	public static final ItemEntry<BacktankBlockItem> COPPER_BACKTANK_PLACEABLE = REGISTRATE
 		.item("copper_backtank_placeable",
 			p -> new BacktankBlockItem(AllBlocks.COPPER_BACKTANK.get(), AllItems.COPPER_BACKTANK::get, p))
 		.model((c, p) -> p.withExistingParent(c.getName(), p.mcLoc("item/barrier")))
 		.register();
 
-	// wrapped by NETHERITE_BACKTANK for block placement uses.
-	// must be registered as of 1.18.2
 	public static final ItemEntry<BacktankBlockItem> NETHERITE_BACKTANK_PLACEABLE = REGISTRATE
 		.item("netherite_backtank_placeable",
 			p -> new BacktankBlockItem(AllBlocks.NETHERITE_BACKTANK.get(), AllItems.NETHERITE_BACKTANK::get, p))
@@ -302,7 +301,7 @@ public class AllItems {
 				p -> new BacktankItem(AllArmorMaterials.COPPER, p, Create.asResource("copper_diving"),
 					COPPER_BACKTANK_PLACEABLE))
 			.model(AssetLookup.customGenericItemModel("_", "item"))
-				.properties(p -> p.durability(-1)) // fabric: Item#canBeDepleted() isn't enough to disable durability, so we need to set its maxDamage to -1 as well
+				.properties(p -> p.durability(-1))
 			.tag(AllItemTags.PRESSURIZED_AIR_SOURCES.tag)
 			.tag(AllItemTags.CHESTPLATE_ARMORS.tag)
 			.register(),
@@ -312,7 +311,7 @@ public class AllItems {
 			p -> new BacktankItem.Layered(ArmorMaterials.NETHERITE, p, Create.asResource("netherite_diving"),
 				NETHERITE_BACKTANK_PLACEABLE))
 		.model(AssetLookup.customGenericItemModel("_", "item"))
-		.properties(p -> p.fireResistant().durability(-1)) // fabric: Item#canBeDepleted() isn't enough to disable durability, so we need to set its maxDamage to -1 as well
+		.properties(p -> p.fireResistant().durability(-1))
 		.tag(AllItemTags.PRESSURIZED_AIR_SOURCES.tag)
 		.tag(AllItemTags.CHESTPLATE_ARMORS.tag)
 		.register();
@@ -409,7 +408,6 @@ public class AllItems {
 			.register();
 
 	// Curiosities
-
 	public static final ItemEntry<LinkedControllerItem> LINKED_CONTROLLER =
 		REGISTRATE.item("linked_controller", LinkedControllerItem::new)
 			.properties(p -> p.stacksTo(1))
@@ -450,7 +448,6 @@ public class AllItems {
 			.register();
 
 	// Logistics
-
 	static {
 		boolean rareCreated = false;
 		boolean normalCreated = false;
@@ -486,7 +483,6 @@ public class AllItems {
 			.register();
 
 	// Schematics
-
 	public static final ItemEntry<Item> EMPTY_SCHEMATIC = REGISTRATE.item("empty_schematic", Item::new)
 		.properties(p -> p.stacksTo(1))
 		.register();
@@ -500,8 +496,13 @@ public class AllItems {
 		.properties(p -> p.stacksTo(1))
 		.register();
 
-	// Shortcuts
+	// ==================== SEU ITEM ====================
+	public static final ItemEntry<ChaveEnergiaItem> CHAVE_ENERGIA = REGISTRATE.item("chave_energia", ChaveEnergiaItem::new)
+			.properties(p -> p.stacksTo(1))
+			.model((c, p) -> p.handheld(c))
+			.register();
 
+	// Shortcuts
 	private static ItemEntry<Item> ingredient(String name) {
 		return REGISTRATE.item(name, Item::new)
 			.register();
@@ -511,11 +512,6 @@ public class AllItems {
 		return REGISTRATE.item(name, SequencedAssemblyItem::new)
 			.register();
 	}
-
-//	private static ItemEntry<HiddenIngredientItem> hiddenIngredient(String name) {
-//		return REGISTRATE.item(name, HiddenIngredientItem::new)
-//			.register();
-//	}
 
 	@SafeVarargs
 	private static ItemEntry<Item> taggedIngredient(String name, TagKey<Item>... tags) {
@@ -532,9 +528,6 @@ public class AllItems {
 			.register();
 	}
 
-	// Load this class
-
 	public static void register() {
 	}
-
-}
+						}
